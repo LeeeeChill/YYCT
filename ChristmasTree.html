@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Styled Subtitle with Fireworks</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courgette&display=swap');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #main {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #video1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -2;
+            object-fit: cover;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        #subtitle {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .line {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            font-family: 'Courgette', cursive;
+            color: #ffffff;
+            text-shadow: 4px 4px 10px rgba(255, 255, 255, 0.9), 0 0 15px #00ff00;
+            margin: 10px 0;
+        }
+
+        .line span {
+            display: inline-block;
+            animation: wave 1.5s infinite ease-in-out, sparkle 1.2s infinite;
+            margin: 0 1px;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { text-shadow: 4px 4px 10px rgba(255, 255, 255, 0.6), 0 0 10px #ff0000; }
+            50% { text-shadow: 6px 6px 20px rgba(255, 255, 255, 1), 0 0 30px #00ff00, 0 0 40px #ff0000; }
+        }
+
+        .line span {
+            animation-delay: calc(var(--i) * 0.1s);
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <!-- 视频 -->
+    <video id="video1" muted autoplay playsinline>
+        <source src="https://tianfeng.space/wp-content/uploads/2022/12/1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- 烟花 Canvas -->
+    <canvas id="fireworksCanvas"></canvas>
+
+    <!-- 字幕 -->
+    <div id="subtitle">
+        <div class="line">
+            <span style="--i: 0;">D</span>
+            <span style="--i: 1;">e</span>
+            <span style="--i: 2;">a</span>
+            <span style="--i: 3;">r</span>
+            <span style="--i: 4;">&nbsp;</span>
+            <span style="--i: 5;">Y</span>
+            <span style="--i: 6;">a</span>
+            <span style="--i: 7;">n</span>
+            <span style="--i: 8;">y</span>
+            <span style="--i: 9;">a</span>
+            <span style="--i: 10;">n</span>
+        </div>
+        <div class="line">
+            <span style="--i: 0;">M</span>
+            <span style="--i: 1;">e</span>
+            <span style="--i: 2;">r</span>
+            <span style="--i: 3;">r</span>
+            <span style="--i: 4;">y</span>
+            <span style="--i: 5;">&nbsp;</span>
+            <span style="--i: 6;">C</span>
+            <span style="--i: 7;">h</span>
+            <span style="--i: 8;">r</span>
+            <span style="--i: 9;">i</span>
+            <span style="--i: 10;">s</span>
+            <span style="--i: 11;">t</span>
+            <span style="--i: 12;">m</span>
+            <span style="--i: 13;">a</span>
+            <span style="--i: 14;">s</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const video = document.getElementById("video1");
+        const subtitle = document.getElementById("subtitle");
+        const canvas = document.getElementById("fireworksCanvas");
+        const ctx = canvas.getContext("2d");
+        let hasSubtitleShown = false;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        video.addEventListener("canplay", function () {
+            video.play().catch(error => console.error("Video playback failed:", error));
+        });
+
+        video.addEventListener("timeupdate", function () {
+            if (video.currentTime >= video.duration / 3 && !hasSubtitleShown) {
+                subtitle.style.opacity = 1;
+                hasSubtitleShown = true;
+            }
+        });
+
+        video.addEventListener("timeupdate", function () {
+            if (video.currentTime >= video.duration * 2 / 3 && video.currentTime <= video.duration * 2 / 3 +0.01) {
+                for (let i = 0; i < 15; i++) {
+                    const x = random(0, canvas.width);
+                    const y = random(0, canvas.height / 2);
+                    fireworks.push(new Firework(x, y));
+                }
+            }
+        });
+
+        video.addEventListener("timeupdate", async function()  {
+            if (video.currentTime >= video.duration * 2 / 3 + 0.01 && video.currentTime <= video.duration) {
+                for (let i = 0; i < 2; i++) {
+                    const x = random(0, canvas.width);
+                    const y = random(0, canvas.height / 2);
+                    fireworks.push(new Firework(x, y));
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            
+        });
+
+        video.addEventListener("timeupdate", async function()  {
+            if (video.currentTime >= video.duration * 8 / 9) {
+                subtitle.style.opacity = 0;
+                hasSubtitleShown = false;
+            }
+        });
+
+        video.addEventListener("ended", function () {
+            // subtitle.style.opacity = 0;
+            // hasSubtitleShown = false;
+            video.currentTime = 0;
+            video.play();
+        });
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        class Particle {
+            constructor(x, y, color, angle, speed, decay, radius) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.angle = angle;
+                this.speedX = Math.cos(angle) * speed;
+                this.speedY = Math.sin(angle) * speed;
+                this.gravity = 0.25;
+                this.decay = decay;
+                this.radius = radius;
+                this.alpha = 1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += this.gravity;
+                this.alpha -= this.decay;
+                this.radius *= 0.99
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Firework {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.particles = [];
+                this.createParticles();
+            }
+
+            createParticles() {
+                const count = random(50, 100);
+                const whiteParticleCount = Math.floor(count * 0.1); // 10% 的粒子为白色
+                for (let i = 0; i < count; i++) {
+                    const angle = random(0, Math.PI * 3);
+                    const speed = random(1, 8);
+                    const decay = random(0.01, 0.02);
+                    const radius = random(2, 5);
+
+                    let color;
+                    if (i < whiteParticleCount) {
+                        // 为少量粒子设置为纯白色
+                        color = `rgba(255, 255, 255, 1)`;
+                    } else {
+                        // 原来的随机颜色逻辑
+                        color = `rgba(${Math.floor(random(0, 100))}, ${Math.floor(random(100, 150))}, ${Math.floor(random(200, 255))}, 1)`;
+                    }
+
+                    this.particles.push(new Particle(this.x, this.y, color, angle, speed, decay, radius));
+                }
+            }
+
+            update() {
+                this.particles = this.particles.filter(p => p.alpha > 0);
+                this.particles.forEach(p => p.update());
+            }
+
+            draw(ctx) {
+                this.particles.forEach(p => p.draw(ctx));
+            }
+        }
+
+        const fireworks = [];
+        function animate() {
+            ctx.globalCompositeOperation = 'destination-out'; // 淡化先前的绘制内容
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.globalCompositeOperation = 'lighter'; // 叠加新内容
+            fireworks.forEach(firework => {
+                firework.update();
+                firework.draw(ctx);
+            });
+
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                if (fireworks[i].particles.length === 0) {
+                    fireworks.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            fireworks.push(new Firework(x, y));
+        });
+
+        setInterval(() => {
+            const x = random(0, canvas.width);
+            const y = random(0, canvas.height / 2);
+            fireworks.push(new Firework(x, y));
+            const x1 = random(0, canvas.width);
+            const y1 = random(0, canvas.height / 2);
+            fireworks.push(new Firework(x1, y1));
+            const x2 = random(0, canvas.width);
+            const y2 = random(0, canvas.height / 2);
+            fireworks.push(new Firework(x2, y2));
+            // const x3 = random(0, canvas.width);
+            // const y3 = random(0, canvas.height / 2);
+            // fireworks.push(new Firework(x3, y3));
+        }, 900);
+
+        animate();
+    });
+</script>
+</body>
+</html>
